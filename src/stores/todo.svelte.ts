@@ -1,5 +1,5 @@
 // Svelte 5 Runesを使用したTODOストア
-import type { Todo, FilterType } from '../types/todo';
+import type { Todo, FilterType, StoredTodo } from '../types/todo';
 
 /**
  * TODOアプリケーションのグローバルストア
@@ -9,13 +9,14 @@ export function createTodoStore() {
   // LocalStorageから初期データを読み込み
   const loadFromStorage = (): Todo[] => {
     if (typeof window === 'undefined') return [];
-    
+
     const stored = localStorage.getItem('svelte5-todos');
     if (stored) {
       try {
-        const parsed = JSON.parse(stored);
-        // Date型の復元
-        return parsed.map((todo: any) => ({
+        // JSON.parse の戻り値は any なので、保存形式の型に明示キャスト
+        const parsed = JSON.parse(stored) as StoredTodo[];
+        // Date 型を string から Date に復元
+        return parsed.map((todo) => ({
           ...todo,
           createdAt: new Date(todo.createdAt),
           updatedAt: todo.updatedAt ? new Date(todo.updatedAt) : undefined

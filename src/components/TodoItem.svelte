@@ -13,12 +13,29 @@
 
   // 編集モードの状態管理
   let isEditing = $state(false);
-  let editText = $state(todo.text);
+  // 初期値は空文字。startEdit() で最新の todo.text を設定する
+  let editText = $state('');
 
-  // 編集開始
+  // 編集入力への参照（autofocus の代替）
+  let editInputEl: HTMLInputElement | undefined = $state();
+
+  // 編集モードに入ったら入力へフォーカス
+  $effect(() => {
+    if (isEditing) editInputEl?.focus();
+  });
+
+  // 編集開始（ダブルクリック or キーボード操作）
   function startEdit() {
     isEditing = true;
     editText = todo.text;
+  }
+
+  // キーボードでの編集開始（Enter / Space）
+  function handleViewKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      startEdit();
+    }
   }
 
   // 編集確定
@@ -49,12 +66,12 @@
   {#if isEditing}
     <div class="edit-container">
       <input
+        bind:this={editInputEl}
         type="text"
         class="edit-input"
         bind:value={editText}
         onblur={confirmEdit}
         onkeydown={handleKeydown}
-        autofocus
       />
     </div>
   {:else}
@@ -71,7 +88,13 @@
           <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
         </svg>
       </label>
-      <span class="todo-text" ondblclick={startEdit}>
+      <span
+        class="todo-text"
+        role="button"
+        tabindex="0"
+        ondblclick={startEdit}
+        onkeydown={handleViewKeydown}
+      >
         {todo.text}
       </span>
       <button class="destroy" onclick={() => onDelete(todo.id)} aria-label="Delete task">

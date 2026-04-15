@@ -1,242 +1,144 @@
-# Svelte 5 TODO アプリケーション - Runesシステム学習用
+# Svelte 5 TODO Example（Runes 学習用）
 
-Svelte 5のRunesシステムとTypeScriptを使用した、フル機能のTODOアプリケーションです。
+Svelte 5 の Runes システム（`$state`・`$derived`・`$effect`・`$props`）を TypeScript で学ぶための TODO アプリです。
+**SvelteKit を使わない純粋な Svelte アプリ**として構築することで、Runes 本体に集中できる構造にしています。
 
-このプロジェクトは、[TypeScriptで学ぶ Svelte 5/SvelteKit 学習ガイド](https://github.com/shuji-bonji/Svelte-and-SvelteKit-with-TypeScript)の実装例として作成されました。**あえてSvelteKitを使用せず**、純粋なSvelte 5アプリケーションとして構築することで、**Runesシステムの理解に集中**できるよう設計しています。
+> 本リポジトリは [**TypeScriptで学ぶ Svelte 5/SvelteKit 学習ガイド**](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/) の教材サンプルです。
+> コードの**解説は学習サイト側**に集約されています。本リポジトリは「動くコード」と「解説との対応表」を提供します。
 
-## 🚀 特徴
+- 📖 **学習サイト記事**: [TODO アプリ実装例](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/examples/todo-app/)
+- 🌐 **デモサイト**: [https://shuji-bonji.github.io/svelte5-todo-example/](https://shuji-bonji.github.io/svelte5-todo-example/)
+- 🗺️ **対応表（記事 ⇔ ファイル）**: [docs/learning-map.md](./docs/learning-map.md)
 
-- **Svelte 5 Runes**: `$state`, `$derived`, `$effect`を活用した最新のリアクティビティシステム
-- **TypeScript**: 完全な型定義による型安全な開発
-- **LocalStorage連携**: ブラウザリロード後もデータを保持
-- **フル機能TODO**: 追加、編集、削除、フィルタリング、一括操作
-- **レスポンシブデザイン**: TodoMVC仕様準拠のUI
+## このサンプルの位置付け
 
-## 📋 実装されている機能
+Svelte 5 の**Runes システムを実装レベルで理解する**ための最小構成サンプルです。
+SvelteKit 固有の機能（ルーティング・Load 関数・Form Actions）は含まず、**クライアントサイドの状態管理**にフォーカスしています。
 
-### 基本機能
-- ✅ TODOの追加
-- ✅ TODOの完了/未完了の切り替え
-- ✅ TODOの削除
-- ✅ TODOの編集（ダブルクリックで編集モード）
-- ✅ TODOの一括完了/解除
+### 学べること
+
+- ✅ **`$state`** を使ったリアクティブな状態管理（`todos`、`filter`）
+- ✅ **`$derived`** と **`$derived.by()`** の違い（単一式 vs 複数文）
+- ✅ **`$props()`** による型安全なコンポーネント props 定義（Callback props パターン）
+- ✅ **`.svelte.ts` モジュール**（Runes をコンポーネント外で使う）
+- ✅ **ゲッターによるカプセル化**（`get todos()` で読み取り専用公開）
+- ✅ **グローバルストアパターン**（関数ファクトリー + シングルトンインスタンス）
+- ✅ **LocalStorage 同期** と Date 型の復元（`StoredTodo` 型分離）
+- ✅ **新しいイベント記法**（`onclick`、`onkeydown`、`onsubmit`）
+
+### 学べないこと（＝他サンプルの担当範囲）
+
+| 学びたいこと | 該当サンプル |
+|-------------|------------|
+| SvelteKit のルーティング・Load 関数・レイアウト | [svelte5-blog-example](https://github.com/shuji-bonji/svelte5-blog-example) |
+| Markdown ベースのコンテンツ管理と全文検索 | [svelte5-blog-markdown](https://github.com/shuji-bonji/svelte5-blog-markdown) |
+| Cookie/Session 認証 | [svelte5-auth-basic](https://github.com/shuji-bonji/svelte5-auth-basic) |
+| JWT 認証 | [svelte5-auth-jwt](https://github.com/shuji-bonji/svelte5-auth-jwt) |
+
+## 機能
+
+### CRUD
+- タスクの追加・完了切替・削除・編集（ダブルクリック）
+- 一括完了/解除（`toggleAll`）
+- 完了済み一括削除（`clearCompleted`）
 
 ### フィルタリング
-- ✅ すべて表示（All）
-- ✅ アクティブなTODOのみ表示（Active）
-- ✅ 完了済みTODOのみ表示（Completed）
+- `all` / `active` / `completed`
 
-### データ永続化
-- ✅ LocalStorageへの自動保存
-- ✅ ページリロード時の自動復元
+### 永続化
+- LocalStorage への自動保存・自動復元
+- Date 型のシリアライズ／デシリアライズを明示的に扱う
 
 ### UI/UX
-- ✅ アクティブなTODOのカウント表示
-- ✅ 完了済みTODOの一括削除
-- ✅ エスケープキーで編集キャンセル
-- ✅ エンターキーで編集確定
-- ✅ 編集時のフォーカス管理
+- Enter で編集確定、Escape で編集キャンセル
+- アクティブタスクのカウント表示
+- ダークモード対応
 
-## 🛠 技術スタック
+## 技術スタック
 
-- **Svelte 5.38+** - 最新のRunesシステム対応
-- **TypeScript 5.8+** - 厳密な型チェック
-- **Vite 7.1+** - 高速な開発環境とビルド
+| 項目 | バージョン |
+|------|-----------|
+| Svelte | 5.38.x |
+| TypeScript | 5.8.x |
+| Vite | 7.1.x |
 
-## 📁 プロジェクト構造
+SvelteKit や adapter-* は使用しません（純粋な SPA）。
 
-```
-svelte5-todo-example/
-├── src/
-│   ├── types/
-│   │   └── todo.ts              # TypeScript型定義
-│   ├── stores/
-│   │   └── todo.svelte.ts       # Svelte 5 Runesストア
-│   ├── components/
-│   │   ├── TodoHeader.svelte    # ヘッダーと入力フィールド
-│   │   ├── TodoItem.svelte      # 個別のTODOアイテム
-│   │   └── TodoFooter.svelte    # フッターとフィルター
-│   ├── App.svelte               # メインアプリケーション
-│   └── main.ts                  # エントリーポイント
-├── package.json
-├── tsconfig.json                # TypeScript設定
-├── vite.config.ts               # Vite設定
-└── README.md                    # このファイル
-```
-
-## 🚀 セットアップと起動
-
-### 前提条件
-- Node.js 20.x LTS以上（推奨）または 18.13以上（最小要件）
-- npm 10.x以上
-
-### インストール
+## セットアップ
 
 ```bash
-# リポジトリのクローン
+# リポジトリを取得
 git clone https://github.com/shuji-bonji/svelte5-todo-example.git
 cd svelte5-todo-example
 
 # 依存関係のインストール
 npm install
-```
 
-### 開発サーバーの起動
-
-```bash
+# 開発サーバー起動
 npm run dev
-```
 
-ブラウザで http://localhost:5173 を開いてアプリケーションを確認できます。
+# 型チェック
+npm run check
 
-### ビルド
-
-```bash
+# 本番ビルド
 npm run build
-```
 
-ビルド成果物は `dist/` ディレクトリに生成されます。
-
-### プレビュー
-
-```bash
+# ビルド成果物のプレビュー
 npm run preview
 ```
 
-ビルドされたアプリケーションをローカルでプレビューできます。
+Node.js 20.x LTS 以上を推奨します。
 
-## 💻 主要なコード例
+## プロジェクト構成
 
-### Svelte 5 Runesを使用した状態管理
-
-```typescript
-// stores/todo.svelte.ts
-export function createTodoStore() {
-  // リアクティブな状態
-  let todos = $state<Todo[]>([]);
-  let filter = $state<FilterType>('all');
-
-  // 派生値
-  let filteredTodos = $derived.by(() => {
-    switch (filter) {
-      case 'active':
-        return todos.filter(todo => !todo.completed);
-      case 'completed':
-        return todos.filter(todo => todo.completed);
-      default:
-        return todos;
-    }
-  });
-
-  // 副作用（LocalStorage同期）
-  $effect(() => {
-    if (todos.length >= 0) {
-      localStorage.setItem('svelte5-todos', JSON.stringify(todos));
-    }
-  });
-
-  // メソッドと公開API
-  return {
-    get todos() { return todos; },
-    get filteredTodos() { return filteredTodos; },
-    addTodo,
-    toggleTodo,
-    // ...
-  };
-}
+```
+svelte5-todo-example/
+├── src/
+│   ├── main.ts                      # エントリーポイント（Svelte アプリを mount）
+│   ├── App.svelte                   # ルートコンポーネント
+│   ├── types/
+│   │   └── todo.ts                  # Todo / StoredTodo / FilterType / TodoStore
+│   ├── stores/
+│   │   └── todo.svelte.ts           # Runes を使ったストア（単一ファイル）
+│   └── components/
+│       ├── TodoHeader.svelte        # 入力フォーム
+│       ├── TodoItem.svelte          # 個別タスク（編集モード含む）
+│       └── TodoFooter.svelte        # フィルター UI
+├── vite.config.ts
+├── svelte.config.js
+├── tsconfig.json / tsconfig.app.json / tsconfig.node.json
+└── docs/
+    └── learning-map.md               # 記事 ⇔ ファイル対応表
 ```
 
-### TypeScriptによる型定義
+各ファイルが学習サイトのどの章に対応するかは [docs/learning-map.md](./docs/learning-map.md) を参照してください。
 
-```typescript
-// types/todo.ts
-export interface Todo {
-  id: string;
-  text: string;
-  completed: boolean;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+## 学習の進め方（推奨）
 
-export type FilterType = 'all' | 'active' | 'completed';
-```
+1. 学習サイトの [TODO アプリ実装例](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/examples/todo-app/) を読む
+2. 学習サイトの [Svelte 5 Runes](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/svelte/runes/) 章も併読
+3. [docs/learning-map.md](./docs/learning-map.md) で記事と本リポジトリのファイルを突き合わせる
+4. `npm run dev` で動かしながらコードを読む
+5. 発展として SvelteKit を使った実装例（[svelte5-blog-example](https://github.com/shuji-bonji/svelte5-blog-example) など）へ
 
-### コンポーネントのProps定義
+## 応用編の方向性
 
-```typescript
-// components/TodoItem.svelte
-interface Props {
-  todo: Todo;
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, text: string) => void;
-}
+本サンプルをベースに拡張する際の候補：
 
-let { todo, onToggle, onDelete, onEdit }: Props = $props();
-```
+### 1. PWA 化
+Service Worker によるオフライン対応、Web App Manifest、プッシュ通知。
 
-## 📚 学習ポイント
+### 2. SvelteKit 化 + サーバー DB
+`+page.server.ts` による Load / Form Actions、Prisma/Drizzle での永続化、認証、マルチユーザー、WebSocket 同期。
 
-このプロジェクトから学べる主な内容：
+いずれも**本リポジトリのスコープ外**です。基礎を押さえたい場合は他サンプル（blog-example、auth-basic など）を参照してください。
 
-1. **Svelte 5 Runes**
-   - `$state`による状態管理
-   - `$derived`と`$derived.by()`による計算値
-   - `$effect`による副作用処理
-   - `$props()`によるコンポーネントプロパティ
+## 関連リンク
 
-2. **TypeScript統合**
-   - 厳密な型定義
-   - インターフェースと型エイリアス
-   - ジェネリック型の活用
+- [TypeScriptで学ぶ Svelte 5/SvelteKit 学習ガイド](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/)
+- [Svelte 公式ドキュメント](https://svelte.dev/docs)
+- [Svelte Runes リファレンス](https://svelte.dev/docs/svelte/what-are-runes)
 
-3. **コンポーネント設計**
-   - 単一責任の原則
-   - プロパティによるデータフロー
-   - イベントハンドリング
-
-4. **状態管理パターン**
-   - グローバルストアの実装
-   - リアクティブな派生値
-   - LocalStorageとの同期
-
-## 🔗 関連リンク
-
-- [Svelte 5公式ドキュメント](https://svelte.dev/docs)
-- [TypeScriptで学ぶ Svelte 5/SvelteKit](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/)
-- [Svelte 5 Runesシステム解説](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/svelte/runes/)
-
-## 📝 ライセンス
+## ライセンス
 
 MIT
-
-## 🤝 コントリビューション
-
-イシューやプルリクエストは歓迎です。大きな変更を行う場合は、まずイシューを開いて変更内容について議論してください。
-
-## 🚀 次のステップ：応用編
-
-このベースとなるTODOアプリを発展させる方向性：
-
-### 1. PWA化
-- Service Workerによるオフライン対応
-- manifest.jsonでアプリ化
-- プッシュ通知の実装
-- ホーム画面への追加
-
-### 2. SvelteKit版への移行
-- サーバーサイド処理の追加
-- データベース連携（Prisma/Drizzle）
-- 認証機能の実装
-- マルチユーザー対応
-- リアルタイム同期（WebSocket）
-
-詳細な応用編については、[メインガイドの実装例ページ](https://shuji-bonji.github.io/Svelte-and-SvelteKit-with-TypeScript/examples/todo-app/)をご覧ください。
-
-## 👨‍💻 作者
-
-[@shuji-bonji](https://github.com/shuji-bonji)
-
----
-
-このプロジェクトはSvelte 5のRunesシステム学習を目的として作成されています。シンプルな実装でRunesの基本を理解した後、PWA化やSvelteKit版への拡張を通じて、段階的に学習を深めることができます。

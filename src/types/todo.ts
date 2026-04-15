@@ -7,6 +7,18 @@ export interface Todo {
   updatedAt?: Date;
 }
 
+/**
+ * LocalStorage に保存された形式の Todo。
+ * JSON.stringify を経由すると Date が ISO 文字列になるため、Todo とは別の型で受ける。
+ */
+export interface StoredTodo {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // フィルター種別の型
 export type FilterType = 'all' | 'active' | 'completed';
 
